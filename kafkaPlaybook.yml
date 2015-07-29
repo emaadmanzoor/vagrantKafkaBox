@@ -9,9 +9,7 @@
     - name: install linux packages
       action: apt update_cache=yes pkg={{item}} state=installed
       with_items:
-        - vim
         - openjdk-7-jdk
-        - python-pip
 
     - name: make /usr/local/kafka directory
       file: path=/usr/local/kafka state=directory
@@ -25,22 +23,10 @@
     - name: rename kafka directory
       command: creates=/usr/local/kafka/kafka-{{ kafka_version }} mv /usr/local/kafka/kafka_{{ scala_version }}-{{ kafka_version }} /usr/local/kafka/kafka-{{ kafka_version }}
 
-    - name: Install pip packages
-      pip: name={{item}} state=present
-      with_items:
-        - kazoo
-        - kafka-python
-
     - name: uncomment and set advertised.host.name
       lineinfile: dest=/usr/local/kafka/kafka-{{ kafka_version }}/config/server.properties
                   insertafter='^#advertised.host.name=<hostname routable by clients>'
-                  line='advertised.host.name=kafka'
-                  state=present
-
-    - name: add kafka to /etc/hosts file
-      lineinfile: dest=/etc/hosts
-                  insertafter='^127\.0\.0\.1\s+localhost$'
-                  line='127.0.0.1\tkafka'
+                  line='advertised.host.name=localhost'
                   state=present
 
     - name: uncomment and set advertised.port line
